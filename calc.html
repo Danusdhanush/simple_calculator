@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+  <style>
+
+    body {
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  height: 100vh;
+
+  margin: 0;
+
+  background-color: #020202;
+
+  font-family: Arial, sans-serif;
+
+}
+
+.calculator {
+
+  border: 1px solid #af9151;
+
+  border-radius: 5px;
+
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  overflow: hidden;
+
+  width: 350px;
+
+}
+
+.display {
+
+  background-color: #333;
+
+  color: white;
+
+  font-size: 2em;
+
+  text-align: right;
+
+  padding: 20px;
+
+  box-sizing: border-box;
+
+}
+
+.buttons {
+
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+}
+
+.btn {
+
+  background-color: #e9d09a;
+
+  border: 1px solid #0c0c0c;
+
+  padding: 20px;
+
+  font-size: 1.5em;
+
+  text-align: center;
+
+  cursor: pointer;
+
+}
+
+.btn:hover {
+
+  background-color: #ddd;
+
+}
+
+.btn:active {
+
+  background-color: #ccc;
+
+}
+
+#equals {
+
+  background-color: #aee654;
+
+  color: white;
+
+  grid-column: span 2;
+
+}
+
+#clear {
+
+  background-color: #0a0a0a;
+
+  color: white;
+
+  grid-column: span 2;
+
+}
+
+  </style>
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Calculator</title>
+
+</head>
+
+<body>
+
+  <div class="calculator">
+
+    <div class="display" id="display">0</div>
+
+    <div class="buttons">
+
+      <button class="btn" id="clear">C</button>
+
+      <button class="btn">/</button>
+
+      <button class="btn">*</button>
+
+      <button class="btn">-</button>
+
+      <button class="btn">1</button>
+
+      <button class="btn">2</button>
+
+      <button class="btn">3</button>
+
+      <button class="btn">+</button>
+
+      <button class="btn">4</button>
+
+      <button class="btn">5</button>
+
+      <button class="btn">6</button>
+
+      <button class="btn">.</button>
+
+      <button class="btn">7</button>
+
+      <button class="btn">8</button>
+
+      <button class="btn">9</button>
+
+      <button class="btn"></button>
+
+      <button class="btn" id="equals">=</button>
+
+      <button class="btn" id="zero">0</button>
+
+    </div>
+
+  </div>
+  <script>
+
+    const display = document.getElementById('display');
+
+    const buttons = Array.from(document.getElementsByClassName('btn'));
+
+    let currentInput = '';
+
+    let operator = '';
+
+    let operand1 = '';
+
+    let shouldClearDisplay = false;
+
+    function updateDisplay() {
+
+      display.innerText = currentInput || '0';
+
+    }
+
+    function evaluate() {
+
+      if (operator && operand1) {
+
+        try {
+
+          currentInput = eval(operand1 + operator + currentInput).toString();
+
+        } catch {
+
+          currentInput = 'Error';
+
+        }
+
+        operator = '';
+
+        operand1 = '';
+
+      }
+
+    }
+
+    buttons.forEach(button => {
+
+      button.addEventListener('click', (e) => {
+
+        const value = e.target.innerText;
+
+        if (value === 'C') {
+
+          currentInput = '';
+
+          operator = '';
+
+          operand1 = '';
+
+          shouldClearDisplay = false;
+
+        } else if (value === '=') {
+
+          evaluate();
+
+          shouldClearDisplay = true;
+
+        } else if (['+', '-', '*', '/'].includes(value)) {
+
+          if (shouldClearDisplay) {
+
+            currentInput = '';
+
+            shouldClearDisplay = false;
+
+          }
+
+          if (operand1 && operator) {
+
+            evaluate();
+
+          } else {
+
+            operand1 = currentInput;
+
+          }
+
+          operator = value;
+
+          currentInput = '';
+
+        } else {
+
+          if (shouldClearDisplay) {
+
+            currentInput = value;
+
+            shouldClearDisplay = false;
+
+          } else {
+
+            currentInput += value;
+
+          }
+
+        }
+
+        updateDisplay();
+
+      });
+
+    });
+
+    document.addEventListener('keydown', (e) => {
+
+      const key = e.key;
+
+      if ('0123456789'.includes(key)) {
+
+        if (shouldClearDisplay) {
+
+          currentInput = key;
+
+          shouldClearDisplay = false;
+
+        } else {
+
+          currentInput += key;
+
+        }
+
+        updateDisplay();
+
+      } else if ('+-*/'.includes(key)) {
+
+        if (shouldClearDisplay) {
+
+          currentInput = '';
+
+          shouldClearDisplay = false;
+
+        }
+
+        if (operand1 && operator) {
+
+          evaluate();
+
+        } else {
+
+          operand1 = currentInput;
+
+        }
+
+        operator = key;
+
+        currentInput = '';
+
+      } else if (key === 'Enter') {
+
+        e.preventDefault();
+
+        evaluate();
+
+        shouldClearDisplay = true;
+
+        updateDisplay();
+
+      } else if (key === 'Backspace') {
+
+        currentInput = currentInput.slice(0, -1);
+
+        updateDisplay();
+
+      } else if (key === 'Escape') {
+
+        currentInput = '';
+
+        operator = '';
+
+        operand1 = '';
+
+        shouldClearDisplay = false;
+
+        updateDisplay();
+
+      }
+
+    });
+
+  </script>
+
+</body>
+
+</html>
